@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Annual Performance Evaluation - Production</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  :root{
+    --purple:#673ab7;
+    --purple-dark:#512da8;
+    --gray-bg:#f0ebf8;
+    --line:#e0e0e0;
+    --text:#202124;
+    --sub:#5f6368;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI', Roboto, Arial, sans-serif;
+    background:var(--gray-bg);
+    color:var(--text);
+    padding-bottom:60px;
+  }
+  .topbar{
+    height:10px;
+    background:var(--purple);
+  }
+  .container{
+    max-width:760px;
+    margin:0 auto;
+    padding:24px 16px;
+  }
+  .card{
+    background:#fff;
+    border-radius:8px;
+    box-shadow:0 1px 2px rgba(0,0,0,0.1);
+    padding:24px 28px;
+    margin-bottom:16px;
+  }
+  .header-card{
+    border-top:10px solid var(--purple);
+  }
+  h1{
+    font-size:22px;
+    margin:0 0 4px 0;
+    color:var(--text);
+  }
+  .company{
+    font-size:14px;
+    color:var(--sub);
+    margin-bottom:16px;
+  }
+  .req-note{
+    font-size:13px;
+    color:#d93025;
+    margin-top:8px;
+  }
+  .rating-def{
+    font-size:13px;
+    line-height:1.6;
+    color:var(--text);
+  }
+  .rating-def b{color:var(--purple-dark);}
+  .instructions{
+    font-size:13px;
+    color:var(--sub);
+    font-style:italic;
+    margin-top:10px;
+  }
+  label.field-label{
+    display:block;
+    font-size:15px;
+    margin-bottom:8px;
+    font-weight:500;
+  }
+  .required-star{color:#d93025;}
+  input[type=text], input[type=date], select, textarea{
+    width:100%;
+    padding:8px 4px;
+    font-size:14px;
+    border:none;
+    border-bottom:1px solid var(--line);
+    background:transparent;
+    font-family:inherit;
+    color:var(--text);
+  }
+  input[readonly]{
+    color:var(--purple-dark);
+    font-weight:600;
+    background:#faf8fd;
+    padding:8px;
+    border-radius:4px;
+    border-bottom:1px solid var(--purple);
+  }
+  input:focus, select:focus, textarea:focus{
+    outline:none;
+    border-bottom:2px solid var(--purple);
+  }
+  textarea{
+    resize:vertical;
+    min-height:50px;
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:8px;
+  }
+  .field-block{
+    margin-bottom:22px;
+  }
+  .lookup-status{
+    font-size:12.5px;
+    margin-top:6px;
+  }
+  .lookup-ok{color:#188038;}
+  .lookup-err{color:#d93025;}
+  .section-title{
+    font-size:17px;
+    font-weight:700;
+    color:var(--purple-dark);
+    margin:0 0 4px 0;
+  }
+  .q-title{
+    font-size:15px;
+    font-weight:700;
+    margin-bottom:6px;
+  }
+  .q-desc{
+    font-size:13.5px;
+    color:var(--sub);
+    line-height:1.5;
+    margin-bottom:14px;
+  }
+  .scale-row{
+    display:flex;
+    justify-content:space-between;
+    max-width:420px;
+    margin:10px 0 4px 0;
+  }
+  .scale-opt{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    font-size:13px;
+    gap:6px;
+  }
+  .scale-opt input{
+    width:20px;height:20px;accent-color:var(--purple);
+  }
+  .scale-caption{
+    display:flex;
+    justify-content:space-between;
+    max-width:420px;
+    font-size:11px;
+    color:var(--sub);
+    margin-bottom:16px;
+  }
+  .comments-label{
+    font-size:13px;
+    color:var(--sub);
+    margin-bottom:6px;
+    display:block;
+  }
+  hr.sep{
+    border:none;border-top:1px solid var(--line);margin:20px 0;
+  }
+  button{
+    font-family:inherit;
+    cursor:pointer;
+  }
+  .submit-btn{
+    background:var(--purple);
+    color:#fff;
+    border:none;
+    padding:10px 26px;
+    border-radius:4px;
+    font-size:14px;
+    font-weight:600;
+  }
+  .submit-btn:hover{background:var(--purple-dark);}
+  .clear-btn{
+    background:none;
+    border:none;
+    color:var(--purple-dark);
+    font-size:14px;
+    margin-left:12px;
+  }
+  .top-actions{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    max-width:760px;
+    margin:0 auto 8px auto;
+    padding:0 16px;
+  }
+  .link-btn{
+    background:none;
+    border:1px solid var(--purple);
+    color:var(--purple-dark);
+    padding:6px 14px;
+    border-radius:4px;
+    font-size:13px;
+  }
+  .link-btn:hover{background:var(--gray-bg);}
+  .msg-banner{
+    max-width:760px;
+    margin:12px auto;
+    padding:12px 16px;
+    border-radius:6px;
+    font-size:14px;
+    display:none;
+  }
+  .msg-ok{background:#e6f4ea;color:#188038;border:1px solid #188038;}
+  .msg-err{background:#fce8e6;color:#c5221f;border:1px solid #c5221f;}
+  table.records{
+    width:100%;
+    border-collapse:collapse;
+    font-size:12.5px;
+    margin-top:12px;
+  }
+  table.records th, table.records td{
+    border:1px solid var(--line);
+    padding:6px 8px;
+    text-align:left;
+  }
+  table.records th{background:var(--gray-bg);}
+  .small-note{font-size:12px;color:var(--sub);}
+  .modal-overlay{
+    display:none;
+    position:fixed;top:0;left:0;right:0;bottom:0;
+    background:rgba(0,0,0,0.4);
+    z-index:50;
+    align-items:flex-start;
+    justify-content:center;
+    overflow-y:auto;
+    padding:40px 12px;
+  }
+  .modal-box{
+    background:#fff;
+    border-radius:8px;
+    max-width:900px;
+    width:100%;
+    padding:20px;
+  }
+  .modal-close{
+    float:right;
+    background:none;border:none;font-size:20px;color:var(--sub);
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar"></div>
+<div class="top-actions">
+  <span class="small-note">Production · Annual Evaluation</span>
+  <button class="link-btn" id="viewRecordsBtn">View Saved Evaluations</button>
+</div>
+
+<div class="container">
+
+  <div id="msgBanner" class="msg-banner"></div>
+
+  <iframe name="hiddenSubmitFrame" style="display:none;"></iframe>
+  <form id="evalForm">
+
+    <!-- HEADER -->
+    <div class="card header-card">
+      <h1>Annual Evaluation Performance Evaluation - Production/Technical</h1>
+      <div class="company">Kuwait Packing Materials Manufacturing Company (K-PAK)</div>
+      <div class="rating-def">
+        <b>DEFINITION OF RATINGS</b><br>
+        <b>(5) EXCEPTIONAL:</b> Consistently exceeds all relevant performance standards.<br>
+        <b>(4) EXCEEDS EXPECTATIONS:</b> Consistently meets and often exceeds all relevant performance standards.<br>
+        <b>(3) MEETS EXPECTATIONS:</b> Meets all relevant performance standards.<br>
+        <b>(2) BELOW EXPECTATIONS:</b> Sometimes meets the performance standards.<br>
+        <b>(1) NEEDS IMPROVEMENT:</b> Consistently falls short of performance standards.
+      </div>
+      <div class="instructions">
+        Describe the employee's contributions in each of the performance categories below.
+        It is COMPULSORY that you illustrate specific, detailed examples. Ratings MUST be
+        supported and substantiated by narrative comments.
+      </div>
+    </div>
+
+    <!-- EMPLOYEE INFO -->
+    <div class="card">
+      <div class="field-block">
+        <label class="field-label">Department <span class="required-star">*</span></label>
+        <select id="deptGroup" required>
+          <option value="">-- Select department --</option>
+        </select>
+      </div>
+
+      <div class="field-block">
+        <label class="field-label">Employee Name <span class="required-star">*</span></label>
+        <select id="empCode" required disabled>
+          <option value="">-- Select department first --</option>
+        </select>
+        <div id="lookupStatus" class="lookup-status"></div>
+      </div>
+
+      <div class="field-block">
+        <label class="field-label">Employee Number</label>
+        <input type="text" id="empCodeDisplay" readonly>
+      </div>
+
+      <div class="field-block">
+        <label class="field-label">Employee Name <span class="required-star">*</span></label>
+        <input type="text" id="empName" readonly required>
+      </div>
+
+      <div class="field-block">
+        <label class="field-label">Department <span class="required-star">*</span></label>
+        <input type="text" id="empDept" readonly required>
+      </div>
+
+      <div class="field-block">
+        <label class="field-label">Section <span class="required-star">*</span></label>
+        <input type="text" id="empSection" readonly required>
+      </div>
+
+      <div class="field-block">
+        <label class="field-label">Position Title <span class="required-star">*</span></label>
+        <input type="text" id="empPosition" readonly required>
+      </div>
+
+      <div class="field-block">
+        <label class="field-label">Date of Joining <span class="required-star">*</span></label>
+        <input type="text" id="empJoinDate" readonly required>
+      </div>
+    </div>
+
+    <!-- I. TECHNICAL / WORKMANSHIP -->
+    <div class="card">
+      <div class="section-title">I. TECHNICAL / WORKMANSHIP</div>
+      <div class="small-note" style="margin-bottom:14px;">Competency</div>
+
+      <div class="q-block">
+        <div class="q-title">I.1 PRODUCTIVITY (VOLUME &amp; QUALITY OF WORK) <span class="required-star">*</span></div>
+        <div class="q-desc">
+          a.) Maintains steady, acceptable level of work output.<br>
+          b.) Quality work adheres to standards and procedures. Keeps complete and reliable records of work.<br>
+          c.) Maintains acceptable standards of workmanship.<br>
+          d.) Indicate the average productivity efficiency of the employee.
+        </div>
+        <div class="scale-row">
+          <label class="scale-opt"><input type="radio" name="q1" value="1" required>1</label>
+          <label class="scale-opt"><input type="radio" name="q1" value="2">2</label>
+          <label class="scale-opt"><input type="radio" name="q1" value="3">3</label>
+          <label class="scale-opt"><input type="radio" name="q1" value="4">4</label>
+          <label class="scale-opt"><input type="radio" name="q1" value="5">5</label>
+        </div>
+        <label class="comments-label">Comments:</label>
+        <textarea id="q1_comments" placeholder="Specific, detailed examples..."></textarea>
+      </div>
+      <hr class="sep">
+
+      <div class="q-block">
+        <div class="q-title">I.2 JOB KNOWLEDGE <span class="required-star">*</span></div>
+        <div class="q-desc">
+          a.) Understanding of job procedures, equipment and methods, responsibilities and scope of duties.<br>
+          b.) Competence in acquiring and analyzing the nature of work assignment and its corresponding action to be taken.
+        </div>
+        <div class="scale-row">
+          <label class="scale-opt"><input type="radio" name="q2" value="1" required>1</label>
+          <label class="scale-opt"><input type="radio" name="q2" value="2">2</label>
+          <label class="scale-opt"><input type="radio" name="q2" value="3">3</label>
+          <label class="scale-opt"><input type="radio" name="q2" value="4">4</label>
+          <label class="scale-opt"><input type="radio" name="q2" value="5">5</label>
+        </div>
+        <label class="comments-label">Comments:</label>
+        <textarea id="q2_comments" placeholder="Specific, detailed examples..."></textarea>
+      </div>
+      <hr class="sep">
+
+      <div class="q-block">
+        <div class="q-title">I.3 COOPERATION (Teamwork &amp; conflict resolution) <span class="required-star">*</span></div>
+        <div class="q-desc">
+          Works with others to accomplish the goals of the job and work group. Demonstrates ability
+          to get along with others, is respectful of co-workers, communicates and acts as a team player,
+          promotes teamwork, responds and acts appropriately to confrontational situations.
+        </div>
+        <div class="scale-row">
+          <label class="scale-opt"><input type="radio" name="q3" value="1" required>1</label>
+          <label class="scale-opt"><input type="radio" name="q3" value="2">2</label>
+          <label class="scale-opt"><input type="radio" name="q3" value="3">3</label>
+          <label class="scale-opt"><input type="radio" name="q3" value="4">4</label>
+          <label class="scale-opt"><input type="radio" name="q3" value="5">5</label>
+        </div>
+        <label class="comments-label">Comments:</label>
+        <textarea id="q3_comments" placeholder="Specific, detailed examples..."></textarea>
+      </div>
+    </div>
+
+    <!-- II. BEHAVIORAL ATTRIBUTES -->
+    <div class="card">
+      <div class="section-title">II. BEHAVIORAL ATTRIBUTES</div>
+      <div class="small-note" style="margin-bottom:14px;">Competency</div>
+
+      <div class="q-block">
+        <div class="q-title">II.1 WORK SAFETY AND MAINTENANCE OF RESOURCES <span class="required-star">*</span></div>
+        <div class="q-desc">
+          Organized and neat. Ensures safety of self and others through proper use and care of
+          equipment/work site. Handles and operates equipment in a careful manner; keeps tools and
+          equipment in working order and stores them properly. Keeps the work site clear of potential
+          hazards. Employee maintains a safe work environment and ensures equipment is operating properly.
+        </div>
+        <div class="scale-row">
+          <label class="scale-opt"><input type="radio" name="q4" value="1" required>1</label>
+          <label class="scale-opt"><input type="radio" name="q4" value="2">2</label>
+          <label class="scale-opt"><input type="radio" name="q4" value="3">3</label>
+          <label class="scale-opt"><input type="radio" name="q4" value="4">4</label>
+          <label class="scale-opt"><input type="radio" name="q4" value="5">5</label>
+        </div>
+        <label class="comments-label">Comments:</label>
+        <textarea id="q4_comments" placeholder="Specific, detailed examples..."></textarea>
+      </div>
+      <hr class="sep">
+
+      <div class="q-block">
+        <div class="q-title">II.2 FLEXIBILITY AND WORK UNDER PRESSURE <span class="required-star">*</span></div>
+        <div class="q-desc">
+          Demonstrates adaptability and flexibility to work on different shifts, schedules or departments.
+          Accepts changes on their daily work. Strives to learn and improve. Seeks out ways to better himself.
+          Takes on responsibilities. Does not remain idle.
+        </div>
+        <div class="scale-row">
+          <label class="scale-opt"><input type="radio" name="q5" value="1" required>1</label>
+          <label class="scale-opt"><input type="radio" name="q5" value="2">2</label>
+          <label class="scale-opt"><input type="radio" name="q5" value="3">3</label>
+          <label class="scale-opt"><input type="radio" name="q5" value="4">4</label>
+          <label class="scale-opt"><input type="radio" name="q5" value="5">5</label>
+        </div>
+        <label class="comments-label">Comments:</label>
+        <textarea id="q5_comments" placeholder="Specific, detailed examples..."></textarea>
+      </div>
+      <hr class="sep">
+
+      <div class="q-block">
+        <div class="q-title">II.3 COMMITMENT TO JOB <span class="required-star">*</span></div>
+        <div class="q-desc">
+          a.) Demonstrates a consistent, dependable work effort and positive work attitude.<br>
+          b.) Responds positively in taking new assignments and accepts challenge so that work can be
+          completed. Takes on additional responsibilities readily. Adaptable to changes in work assignments.
+        </div>
+        <div class="scale-row">
+          <label class="scale-opt"><input type="radio" name="q6" value="1" required>1</label>
+          <label class="scale-opt"><input type="radio" name="q6" value="2">2</label>
+          <label class="scale-opt"><input type="radio" name="q6" value="3">3</label>
+          <label class="scale-opt"><input type="radio" name="q6" value="4">4</label>
+          <label class="scale-opt"><input type="radio" name="q6" value="5">5</label>
+        </div>
+        <label class="comments-label">Comments:</label>
+        <textarea id="q6_comments" placeholder="Specific, detailed examples..."></textarea>
+      </div>
+    </div>
+
+    <!-- OTHER -->
+    <div class="card">
+      <div class="field-block">
+        <label class="field-label">Other comments</label>
+        <textarea id="otherComments"></textarea>
+      </div>
+      <div class="field-block">
+        <label class="field-label">Evaluated by <span class="required-star">*</span></label>
+        <input type="text" id="evaluatedBy" required>
+      </div>
+      <div class="field-block">
+        <label class="field-label">Evaluation Date <span class="required-star">*</span></label>
+        <input type="date" id="evalDate" required>
+      </div>
+    </div>
+
+    <div class="card" style="display:flex;align-items:center;">
+      <button type="submit" class="submit-btn">Submit</button>
+      <button type="reset" class="clear-btn">Clear form</button>
+    </div>
+
+  </form>
+</div>
+
+<!-- RECORDS MODAL -->
+<div class="modal-overlay" id="recordsModal">
+  <div class="modal-box">
+    <button class="modal-close" id="closeModalBtn">&times;</button>
+    <h2 style="margin-top:0;">Saved Evaluations</h2>
+    <p class="small-note">These evaluations are saved to shared storage and visible to anyone who opens this page.</p>
+    <button class="link-btn" id="exportBtn">Export All to Excel</button>
+    <div id="recordsTableWrap"><p class="small-note">Loading...</p></div>
+  </div>
+</div>
+
+<script>
+// PASTE the SAME Google Apps Script Web App URL used in the Tool Room form here,
+// so both forms feed into the same Google Sheet. Must end in /exec.
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxH3_dMh1p7p-AO3iEPRHICF-6tyawkHijvUdEpIgqToFIp8clc_Gf0d8WrUczNv1xzCg/exec";
+
+const EMPLOYEES = {
+  // ---- CUPS ----
+  "K1246": {name:"VINEETH HARIDAS", dept:"Production", section:"CUPS", position:"Machine operator", joinDate:"20/12/2021"},
+  "K1256": {name:"SANTOSH RAI", dept:"Production", section:"CUPS", position:"Production labor", joinDate:"23/02/2022"},
+  "K1284": {name:"FERDINAND SON LOGAN", dept:"Production", section:"CUPS", position:"Production labor", joinDate:"29/05/2022"},
+  "K1367": {name:"RANJIT BARMAN", dept:"Production", section:"CUPS", position:"Helper", joinDate:"03/05/2025"},
+  "K1371": {name:"ARJUN GOPI", dept:"Production", section:"CUPS", position:"Helper", joinDate:"29/05/2025"},
+  "K852":  {name:"SYED GHOUSE BASHA DODOIKALLA", dept:"Production", section:"CUPS", position:"Production labor", joinDate:"04/01/2007"},
+  "K868":  {name:"RANJITH KUZHIPARAMBIL KUZHIPARAMBIL", dept:"Production", section:"CUPS", position:"Shift Leader", joinDate:"30/01/2009"},
+  "K897":  {name:"JINU THAYILL RAJU", dept:"Production", section:"CUPS", position:"Operator", joinDate:"19/04/2010"},
+  "K919":  {name:"INDRA KUMAR GURUNG", dept:"Production", section:"CUPS", position:"Operator", joinDate:"11/10/2010"},
+  "K936":  {name:"BISHAL RAI", dept:"Production", section:"CUPS", position:"Machine operator", joinDate:"30/04/2011"},
+
+  // ---- FOAM & PRINTING ----
+  "K1014": {name:"MARVIN MOJICA ALONZO", dept:"Production", section:"FOAM", position:"Machine operator", joinDate:"10/05/2014"},
+  "K1023": {name:"SHAIK LATEEF AHMED", dept:"Production", section:"PRINTING", position:"Machine operator", joinDate:"14/06/2014"},
+  "K1048": {name:"OMAR FAWZY DARDIR TAWFIK", dept:"ZEEMA", section:"ZEEMA", position:"Machine operator", joinDate:"27/07/2015"},
+  "K1080": {name:"MAHAMMAD KHALEEL BASHA RAFISHAIK", dept:"Production", section:"PRINTING", position:"Production labor", joinDate:"28/07/2016"},
+  "K1082": {name:"RODERICK MENDOZA ALCANTARA", dept:"Production", section:"PRINTING", position:"Machine operator", joinDate:"01/08/2016"},
+  "K1099": {name:"EMELIO JR LANOTAN MACALAM", dept:"Production", section:"FOAM", position:"Operator", joinDate:"15/04/2017"},
+  "K1154": {name:"RAMACHANDRAN KUZHIPARAMBIL", dept:"Production", section:"FOAM", position:"Machine operator", joinDate:"04/08/2018"},
+  "K1218": {name:"AJIN PRAKASH", dept:"Production", section:"FOAM", position:"Machine operator", joinDate:"18/01/2020"},
+  "K1237": {name:"MOHAMED FOUAD KHALIFA ABDALLA", dept:"ZEEMA", section:"ZEEMA", position:"Helper", joinDate:"24/11/2021"},
+  "K1247": {name:"SIMANCHAL DAKUA", dept:"Production", section:"FOAM", position:"Machine operator", joinDate:"02/01/2022"},
+  "K1255": {name:"SAILESH KUMAR YADAV", dept:"Production", section:"FOAM", position:"Machine operator", joinDate:"23/02/2022"},
+  "K1258": {name:"ARJUN KUMAR RAY", dept:"Production", section:"PRINTING", position:"Production labor", joinDate:"23/02/2022"},
+  "K1259": {name:"MUKESH CHAUDHARY", dept:"Production", section:"FOAM", position:"Production labor", joinDate:"23/02/2022"},
+  "K1267": {name:"ZAINEL NOLIMAR SOLIS SULA", dept:"Production", section:"FOAM", position:"Machine operator", joinDate:"23/04/2022"},
+  "K1281": {name:"RYAN DOMENIC MAYO", dept:"Production", section:"PRINTING", position:"Production labor", joinDate:"24/05/2022"},
+  "K1282": {name:"JERMORE CAINGLES CAGUISANO", dept:"Production", section:"FOAM", position:"Production labor", joinDate:"24/05/2022"},
+  "K1317": {name:"MOHAMMED SIDDIQ SHAIK", dept:"Production", section:"FOAM", position:"Production labor", joinDate:"01/02/2023"},
+  "K1320": {name:"JOHN REY ROMERO GAMO", dept:"Production", section:"FOAM", position:"Machine operator", joinDate:"20/03/2023"},
+  "K1321": {name:"JUNAS MARIQUIT NOGAS", dept:"Production", section:"FOAM", position:"Production labor", joinDate:"20/03/2023"},
+  "K1322": {name:"DANIEL CEDO TAYA", dept:"Production", section:"FOAM", position:"Machine operator", joinDate:"20/03/2023"},
+  "K1323": {name:"DANTE MENDOZA", dept:"Production", section:"FOAM", position:"Production labor", joinDate:"20/03/2023"},
+  "K1335": {name:"RUBEN MORATALLAN MONILLA", dept:"Production", section:"FOAM", position:"Machine operator", joinDate:"01/08/2023"},
+  "K1345": {name:"ANAND SURYA", dept:"Production", section:"FOAM", position:"Production labor", joinDate:"01/07/2024"},
+  "K402":  {name:"ASOK KUMAR PANNI VIZHA SADANANDAM", dept:"Production", section:"FOAM", position:"Assistant Supervisor", joinDate:"01/07/2012"},
+  "K826":  {name:"AMIR GURUNG KHADGA", dept:"Production", section:"FOAM", position:"Operator", joinDate:"22/03/2007"},
+  "K857":  {name:"SUBRAMANIAN MUTHAT CHAKKU MUTHAT", dept:"Production", section:"FOAM", position:"Operator", joinDate:"19/05/2008"},
+  "K903":  {name:"NINO ALOB LAGARTO", dept:"Production", section:"FOAM", position:"Assistant Supervisor", joinDate:"16/08/2010"},
+  "K910":  {name:"INDRA BAHADUR SARKI", dept:"Production", section:"FOAM", position:"Operator", joinDate:"26/09/2010"},
+  "K913":  {name:"LAL MANI KHANAL", dept:"Production", section:"FOAM", position:"Machine operator", joinDate:"03/10/2010"},
+  "K928":  {name:"NABIN KUMAR RAI", dept:"Production", section:"FOAM", position:"Operator", joinDate:"30/04/2011"},
+  "K931":  {name:"PADAM BAHADUR GURUNG", dept:"Production", section:"FOAM", position:"Shift Leader", joinDate:"30/04/2011"},
+  "Z0008": {name:"AHMED MOHAMED IMBABY MOHAMED", dept:"KPAK", section:"KPAK", position:"Production labor", joinDate:"07/01/2017"},
+  "Z0024": {name:"EMETERIO CRUZ VALERIO", dept:"KPAK", section:"KPAK", position:"Production Supervisor", joinDate:"01/05/2023"},
+  "Z0028": {name:"JOEL DE GUZMAN ENERO", dept:"KPAK", section:"KPAK", position:"Operator", joinDate:"01/01/2024"},
+  "Z0021": {name:"MOHAMMED AIYAZ ALI", dept:"KPAK", section:"KPAK", position:"Operator", joinDate:"01/02/2022"},
+  "Z0030": {name:"RICHARD UMLAS CABAN", dept:"KPAK", section:"KPAK", position:"Operator", joinDate:"01/02/2024"},
+
+  // ---- CLEAR / INJECTION / ZEEMA ----
+  "K1109": {name:"DYAN RODRIGUEZ ATENCION", dept:"Production", section:"CLEAR", position:"Shift Leader", joinDate:"17/07/2017"},
+  "K1162": {name:"RONALD BUENAVENTURA RAYO", dept:"Production", section:"CLEAR", position:"Production Supervisor", joinDate:"22/09/2018"},
+  "K1168": {name:"WAEL MOHAMED ANWAR BARAKAT", dept:"ZEEMA", section:"ZEEMA", position:"Assistant Supervisor", joinDate:"21/11/2018"},
+  "K1175": {name:"JANLLESLIE DELA CRUZ DOMINGO", dept:"Production", section:"CLEAR", position:"Operator", joinDate:"09/03/2019"},
+  "K1178": {name:"PAUL GALVEZ DELACRUZ", dept:"Production", section:"CLEAR", position:"Machine operator", joinDate:"16/03/2019"},
+  "K1197": {name:"SUTHAKAR PANEER SELVAM", dept:"Production", section:"CLEAR", position:"Operator", joinDate:"11/09/2019"},
+  "K1244": {name:"ANANDU ARAVINDAN", dept:"Production", section:"CLEAR", position:"Machine operator", joinDate:"20/12/2021"},
+  "K1249": {name:"SHREE CHANDRA", dept:"Production", section:"CLEAR", position:"Production labor", joinDate:"15/01/2022"},
+  "K1253": {name:"CHANDRA BUDHA", dept:"Production", section:"CLEAR", position:"Production labor", joinDate:"23/02/2022"},
+  "K1264": {name:"RUPLAL BUDHA", dept:"Production", section:"CLEAR", position:"Production labor", joinDate:"13/04/2022"},
+  "K1269": {name:"JAHMIL BALAO JAVIER", dept:"Production", section:"CLEAR", position:"Production labor", joinDate:"23/04/2022"},
+  "K1270": {name:"JOHNIFER GALANG RAYO", dept:"Production", section:"CLEAR", position:"Machine operator", joinDate:"23/04/2022"},
+  "K1272": {name:"SHERWIN YANGA MABBUN", dept:"Production", section:"CLEAR", position:"Production labor", joinDate:"23/04/2022"},
+  "K1273": {name:"GILMARK AMBRE GUIYAB", dept:"Production", section:"CLEAR", position:"Production labor", joinDate:"23/04/2022"},
+  "K1275": {name:"ANANDHU KRISHNAN RADHAKRISHNAPILLA", dept:"Production", section:"INJECTION", position:"Production labor", joinDate:"26/04/2022"},
+  "K1280": {name:"ALJOHN MAGHINAY", dept:"ZEEMA", section:"ZEEMA", position:"Production labor", joinDate:"24/05/2022"},
+  "K1293": {name:"RODERICK GRAFILO MIRANDA", dept:"Production", section:"CLEAR", position:"Machine operator", joinDate:"21/07/2022"},
+  "K1302": {name:"MICHAEL LOPEZ MUNOZ", dept:"Production", section:"CLEAR", position:"Operator", joinDate:"18/09/2022"},
+  "K1325": {name:"JAIME JR CAILO DIMATE", dept:"Production", section:"CLEAR", position:"Machine operator", joinDate:"20/03/2023"},
+  "K1334": {name:"ARUN KUMAR NARANAYANAKURUP", dept:"Production", section:"INJECTION", position:"Production labor", joinDate:"24/06/2023"},
+  "K1346": {name:"AKSHAI DAS", dept:"Production", section:"CLEAR", position:"Production labor", joinDate:"01/07/2024"},
+  "K1361": {name:"ARUN MOHAN", dept:"ZEEMA", section:"ZEEMA", position:"Production labor", joinDate:"12/04/2025"},
+  "K1369": {name:"PREETH PRASANNA KUMAR", dept:"Production", section:"CLEAR", position:"Helper", joinDate:"13/05/2025"},
+  "K915":  {name:"RAJENDRA RAI", dept:"ZEEMA", section:"ZEEMA", position:"Production labor", joinDate:"03/10/2010"},
+  "K1245": {name:"HARIVISHNU HAREENDRAN", dept:"Production", section:"Production", position:"PRODUCTION COORDINATOR", joinDate:"20/12/2021"},
+  "K1330": {name:"SONNY TUMPANG DERLA", dept:"Production", section:"Production", position:"Production Planner", joinDate:"25/03/2023"},
+  "Z0027": {name:"MARVIN GREGORIO CATAHAN", dept:"KPAK", section:"KPAK", position:"Assistant Supervisor", joinDate:"01/01/2024"},
+  "Z0034": {name:"MICHAEL LIBRADILLA EBIT", dept:"KPAK", section:"KPAK", position:"Machine operator", joinDate:"08/09/2024"},
+  "Z0033": {name:"ROWIE DERAYA POMIDA", dept:"KPAK", section:"KPAK", position:"Assistant Supervisor", joinDate:"13/06/2024"},
+  "Z0018": {name:"AHMED MOHAMED ELSAYED MOHAMED ELSAWI", dept:"Production", section:"Production", position:"Operator", joinDate:"12/03/2018"},
+  "Z0006": {name:"MOHAMMED ABDULHAMEED MOHAMMED ABDUL RAZZAQ", dept:"Production", section:"Production", position:"Machine operator", joinDate:"28/12/2016"}
+};
+
+// Groups the department dropdown by which excel file the employee came from.
+// Note: K1237 and Z0008 appear in both the Foam & Printing and Clear/Injection/Zeema
+// source files, so they're listed in both groups here too, matching the source data.
+const GROUPS = {
+  "CUPS": ["K1246","K1256","K1284","K1367","K1371","K852","K868","K897","K919","K936"],
+  "FOAM & PRINTING": ["K1014","K1023","K1048","K1080","K1082","K1099","K1154","K1218","K1237","K1247","K1255","K1258","K1259","K1267","K1281","K1282","K1317","K1320","K1321","K1322","K1323","K1335","K1345","K402","K826","K857","K903","K910","K913","K928","K931","Z0008","Z0024","Z0028","Z0021","Z0030"],
+  "CLEAR / INJECTION / ZEEMA": ["K1109","K1162","K1168","K1175","K1178","K1197","K1237","K1244","K1249","K1253","K1264","K1269","K1270","K1272","K1273","K1275","K1280","K1293","K1302","K1325","K1334","K1346","K1361","K1369","K915","K1245","K1330","Z0008","Z0027","Z0034","Z0033","Z0018","Z0006"]
+};
+
+const deptGroupSelect = document.getElementById('deptGroup');
+const empCodeInput = document.getElementById('empCode');
+const empCodeDisplay = document.getElementById('empCodeDisplay');
+const empName = document.getElementById('empName');
+const empDept = document.getElementById('empDept');
+const empSection = document.getElementById('empSection');
+const empPosition = document.getElementById('empPosition');
+const empJoinDate = document.getElementById('empJoinDate');
+const lookupStatus = document.getElementById('lookupStatus');
+
+// Populate the department dropdown from the GROUPS keys
+for(const groupName of Object.keys(GROUPS)){
+  const opt = document.createElement('option');
+  opt.value = groupName;
+  opt.textContent = groupName;
+  deptGroupSelect.appendChild(opt);
+}
+
+deptGroupSelect.addEventListener('change', function(){
+  const group = this.value;
+  empCodeInput.innerHTML = '';
+  clearEmpFields();
+  lookupStatus.textContent = '';
+
+  if(!group){
+    empCodeInput.disabled = true;
+    const opt = document.createElement('option');
+    opt.value = '';
+    opt.textContent = '-- Select department first --';
+    empCodeInput.appendChild(opt);
+    return;
+  }
+
+  empCodeInput.disabled = false;
+  const placeholder = document.createElement('option');
+  placeholder.value = '';
+  placeholder.textContent = '-- Select employee --';
+  empCodeInput.appendChild(placeholder);
+
+  const codes = GROUPS[group].slice().sort((a,b)=> EMPLOYEES[a].name.localeCompare(EMPLOYEES[b].name));
+  for(const code of codes){
+    const opt = document.createElement('option');
+    opt.value = code;
+    opt.textContent = EMPLOYEES[code].name;
+    empCodeInput.appendChild(opt);
+  }
+});
+
+function doLookup(){
+  const raw = empCodeInput.value;
+  if(!raw){
+    clearEmpFields();
+    lookupStatus.textContent = '';
+    return;
+  }
+  const rec = EMPLOYEES[raw];
+  if(rec){
+    empCodeDisplay.value = raw;
+    empName.value = rec.name;
+    empDept.value = rec.dept;
+    empSection.value = rec.section;
+    empPosition.value = rec.position;
+    empJoinDate.value = rec.joinDate;
+    lookupStatus.textContent = '✓ Employee data loaded';
+    lookupStatus.className = 'lookup-status lookup-ok';
+  } else {
+    clearEmpFields();
+    lookupStatus.textContent = '✗ Employee not found';
+    lookupStatus.className = 'lookup-status lookup-err';
+  }
+}
+function clearEmpFields(){
+  empCodeDisplay.value = '';
+  empName.value = '';
+  empDept.value = '';
+  empSection.value = '';
+  empPosition.value = '';
+  empJoinDate.value = '';
+}
+empCodeInput.addEventListener('change', doLookup);
+
+function showMsg(text, ok){
+  const el = document.getElementById('msgBanner');
+  el.textContent = text;
+  el.className = 'msg-banner ' + (ok ? 'msg-ok' : 'msg-err');
+  el.style.display = 'block';
+  window.scrollTo({top:0, behavior:'smooth'});
+  setTimeout(()=>{ el.style.display='none'; }, 5000);
+}
+
+document.getElementById('evalForm').addEventListener('submit', function(e){
+  e.preventDefault();
+
+  const code = empCodeInput.value;
+  if(!EMPLOYEES[code]){
+    showMsg('Please select an employee before submitting.', false);
+    return;
+  }
+
+  const getVal = (name) => {
+    const el = document.querySelector(`input[name="${name}"]:checked`);
+    return el ? el.value : '';
+  };
+
+  const record = {
+    employeeCode: code,
+    employeeName: empName.value,
+    department: empDept.value,
+    section: empSection.value,
+    position: empPosition.value,
+    joinDate: empJoinDate.value,
+    q1_productivity: getVal('q1'),
+    q1_comments: document.getElementById('q1_comments').value,
+    q2_jobKnowledge: getVal('q2'),
+    q2_comments: document.getElementById('q2_comments').value,
+    q3_cooperation: getVal('q3'),
+    q3_comments: document.getElementById('q3_comments').value,
+    q4_safety: getVal('q4'),
+    q4_comments: document.getElementById('q4_comments').value,
+    q5_flexibility: getVal('q5'),
+    q5_comments: document.getElementById('q5_comments').value,
+    q6_commitment: getVal('q6'),
+    q6_comments: document.getElementById('q6_comments').value,
+    otherComments: document.getElementById('otherComments').value,
+    evaluatedBy: document.getElementById('evaluatedBy').value,
+    evalDate: document.getElementById('evalDate').value,
+    submittedAt: new Date().toISOString()
+  };
+
+  if(APPS_SCRIPT_URL.indexOf('PASTE_YOUR') === 0){
+    showMsg('This form is not connected to a Google Sheet yet. Ask the administrator to finish setup.', false);
+    return;
+  }
+
+  // Submit via a real hidden <form> POST targeting a hidden iframe.
+  // This is a plain browser form submission (not a fetch/XHR call), so it is
+  // NEVER subject to CORS or JS-level network blocking - the same mechanism
+  // any ordinary HTML <form> on the web has used for 25+ years.
+  const hiddenForm = document.createElement('form');
+  hiddenForm.method = 'POST';
+  hiddenForm.action = APPS_SCRIPT_URL;
+  hiddenForm.target = 'hiddenSubmitFrame';
+  hiddenForm.style.display = 'none';
+
+  Object.keys(record).forEach(function(key){
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = key;
+    input.value = record[key] === undefined || record[key] === null ? '' : String(record[key]);
+    hiddenForm.appendChild(input);
+  });
+
+  document.body.appendChild(hiddenForm);
+  hiddenForm.submit();
+  setTimeout(function(){ hiddenForm.remove(); }, 3000);
+
+  // We can't read the response back from a cross-site iframe target, so we
+  // optimistically confirm submission. Please verify periodically in the
+  // Google Sheet.
+  showMsg('Evaluation submitted. Please verify it appears in the Google Sheet shortly.', true);
+  document.getElementById('evalForm').reset();
+  clearEmpFields();
+  lookupStatus.textContent = '';
+});
+
+// ---- Records modal ----
+const modal = document.getElementById('recordsModal');
+document.getElementById('viewRecordsBtn').addEventListener('click', async ()=>{
+  modal.style.display = 'flex';
+  await loadRecords();
+});
+document.getElementById('closeModalBtn').addEventListener('click', ()=>{
+  modal.style.display = 'none';
+});
+
+let cachedRecords = [];
+
+async function loadRecords(){
+  const wrap = document.getElementById('recordsTableWrap');
+  wrap.innerHTML = '<p class="small-note">Loading...</p>';
+
+  if(APPS_SCRIPT_URL.indexOf('PASTE_YOUR') === 0){
+    wrap.innerHTML = '<p class="small-note" style="color:#c5221f;">Not connected to a Google Sheet yet.</p>';
+    cachedRecords = [];
+    return;
+  }
+
+  try{
+    const res = await fetch(APPS_SCRIPT_URL + '?data=1', { method: 'GET' });
+    const records = await res.json();
+    if(!Array.isArray(records) || records.length === 0){
+      wrap.innerHTML = '<p class="small-note">No evaluations submitted yet.</p>';
+      cachedRecords = [];
+      return;
+    }
+    records.sort((a,b)=> String(b.submittedAt||'').localeCompare(String(a.submittedAt||'')));
+    cachedRecords = records;
+
+    let html = '<table class="records"><thead><tr>' +
+      '<th>Emp #</th><th>Name</th><th>Position</th>' +
+      '<th>Prod.</th><th>Job Know.</th><th>Coop.</th><th>Safety</th><th>Flex.</th><th>Commit.</th>' +
+      '<th>Evaluated By</th><th>Date</th>' +
+      '</tr></thead><tbody>';
+    for(const r of records){
+      html += `<tr>
+        <td>${r.employeeCode||''}</td>
+        <td>${r.employeeName||''}</td>
+        <td>${r.position||''}</td>
+        <td>${r.q1_productivity||''}</td>
+        <td>${r.q2_jobKnowledge||''}</td>
+        <td>${r.q3_cooperation||''}</td>
+        <td>${r.q4_safety||''}</td>
+        <td>${r.q5_flexibility||''}</td>
+        <td>${r.q6_commitment||''}</td>
+        <td>${r.evaluatedBy||''}</td>
+        <td>${r.evalDate||''}</td>
+      </tr>`;
+    }
+    html += '</tbody></table>';
+    wrap.innerHTML = html;
+  } catch(err){
+    wrap.innerHTML = '<p class="small-note" style="color:#c5221f;">Error loading records: '+err.message+'</p>';
+  }
+}
+
+document.getElementById('exportBtn').addEventListener('click', ()=>{
+  if(!cachedRecords.length){
+    alert('No records to export yet.');
+    return;
+  }
+  const rows = cachedRecords.map(r => ({
+    'Employee Number': r.employeeCode,
+    'Employee Name': r.employeeName,
+    'Department': r.department,
+    'Section': r.section,
+    'Position Title': r.position,
+    'Date of Joining': r.joinDate,
+    'I.1 Productivity': r.q1_productivity,
+    'I.1 Comments': r.q1_comments,
+    'I.2 Job Knowledge': r.q2_jobKnowledge,
+    'I.2 Comments': r.q2_comments,
+    'I.3 Cooperation': r.q3_cooperation,
+    'I.3 Comments': r.q3_comments,
+    'II.1 Work Safety': r.q4_safety,
+    'II.1 Comments': r.q4_comments,
+    'II.2 Flexibility': r.q5_flexibility,
+    'II.2 Comments': r.q5_comments,
+    'II.3 Commitment': r.q6_commitment,
+    'II.3 Comments': r.q6_comments,
+    'Other Comments': r.otherComments,
+    'Evaluated By': r.evaluatedBy,
+    'Evaluation Date': r.evalDate,
+    'Submitted At': r.submittedAt
+  }));
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Evaluations');
+  XLSX.writeFile(wb, 'Annual_Evaluations_Export.xlsx');
+});
+</script>
+
+</body>
+</html>
