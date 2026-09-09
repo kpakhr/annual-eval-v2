@@ -779,6 +779,11 @@ document.getElementById('evalForm').addEventListener('submit', function(e){
 // ---- Records modal ----
 const modal = document.getElementById('recordsModal');
 document.getElementById('viewRecordsBtn').addEventListener('click', async ()=>{
+  const pw = prompt('Enter password to view saved evaluations:');
+  if(pw !== 'Kpak@123'){
+    if(pw !== null){ alert('Incorrect password.'); }
+    return;
+  }
   modal.style.display = 'flex';
   await loadRecords();
 });
